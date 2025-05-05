@@ -4,6 +4,8 @@
 //Caso você queira salvar em um outro SLOT, basta usar: <criar @Usuário elfo 2
 //Como o perfil principal esta salvo como profileMain, você pode salvar os SLOTS em qualquer valor que achar necessário, como o 1 por exemplo.
 
+//Caso você saiba o que está fazendo, você pode mudar os nomes das raças e os valores que cada um vai dar para o stats correspondentes, no entanto evite mudar o nome dos 'sdicts' para os STATS, como MaxHP e MaxEnergia, já que esses estão presentes em outros comandos.
+
 {{$ln := (len .Args)}}
 {{$humano:= sdict "MaxHP" 80 "MaxEnergia" 0 "DanoFis" 10 "DanoMa" 0 "Nivel" 1 "Escudo" 0 "RD" 0 "Sanidade" 0}}
 {{$elfo:= sdict "MaxHP" 60 "MaxEnergia" 50 "DanoFis" 10 "DanoMa" 5 "Nivel" 1 "Escudo" 0 "RD" 0 "Sanidade" 0}}
