@@ -1,0 +1,37 @@
+//Este comando serve para você salvar uma foto a seu perfil, porfavor use links de imagem do discord
+
+{{$ln := (len .Args)}}
+{{$id := (toInt64 .User.ID)}}
+{{if gt $ln 2}}
+	{{$2 := (index .Args 2)}}
+	{{$1 := (index .Args 1)}}
+	{{$foto := $1}}
+	{{$profileK := printf "profile%d" (toInt $2)}}
+ 	{{$exist := dbGet $id $profileK}}
+		{{if $exist}}
+		{{$profile := sdict $exist.Value}}
+		{{$profile.Set "foto" $foto}}
+		{{dbSet $id $profileK $profile}}
+		{{$msg2 := (joinStr "" "**Foto salva no __" $profileK "__**")}}
+		{{sendMessage nil $msg2}}
+		{{else}}
+		{{$msg1 := (joinStr "" "**Não existe um perfil neste Slot!" $profileK "**")}}
+		{{sendMessage nil $msg1}}
+		{{end}}
+	{{else}}
+{{if gt $ln 1}}
+{{$1 := (index .Args 1)}}
+{{$foto := $1}}
+{{$exist := dbGet $id "profilemain"}}
+	{{if $exist}}
+	{{$profile := sdict $exist.Value}}
+	{{$profile.Set "foto" $foto}}
+	{{dbSet $id "profilemain" $profile}}
+	**Foto salva no perfil principal com sucesso!**
+	{{else}}
+	**Você não tem um perfil!**
+	{{end}}
+{{else}}
+**Você não especificou nada! O uso correto do comando é: <foto __<link da foto(discord)>__ __<Slot(opcional)>__**
+{{end}}
+{{end}}
