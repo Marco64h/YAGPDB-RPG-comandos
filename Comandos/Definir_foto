@@ -1,5 +1,7 @@
 //Este comando serve para você salvar uma foto a seu perfil, porfavor use links de imagem do discord
 //Caso você use o mesmo prefixo, porfavor use: <foto https://media.discordapp.net/attachments/1294089832959836235/1304547067263189002/16818f2ca097fea10c6aa9ac0180a43e2.jpg?ex=681a74a2&is=68192322&hm=7e695d5590e7fe34b128cce825bdda019e9c921c5945d55549f9f74f305360a3&
+//Caso seja para salvar em outro SLOT, só especificar o número do SLOT por último: <foto https://media.discordapp.net/attachments/1294089832959836235/1304547067263189002/16818f2ca097fea10c6aa9ac0180a43e2.jpg?ex=681a74a2&is=68192322&hm=7e695d5590e7fe34b128cce825bdda019e9c921c5945d55549f9f74f305360a3& 2
+
 
 {{$ln := (len .Args)}}
 {{$id := (toInt64 .User.ID)}}
