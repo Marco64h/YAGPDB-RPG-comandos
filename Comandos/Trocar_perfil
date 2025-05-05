@@ -1,0 +1,24 @@
+//Este comando serve para trocar seu perfil principal com outro perfil existente em outro SLOT
+//Crie um perfil dentro de outro SLOT apartir de "Criar Perfil" para conseguir trocar
+//Caso o prefixo sejam os mesmos, basta usar: <trocar 2
+
+{{$args := parseArgs 1 "Uso correto: -trocar <profileNumber>" (carg "int" "profileNumber")}}
+{{$userID := .User.ID}}
+{{$profileNum := $args.Get 0}}
+{{$profileKey := printf "profile%d" (toInt $profileNum)}}
+
+
+{{$mainProfile := dbGet $userID "profilemain"}}
+{{$swapProfile := dbGet $userID $profileKey}}
+
+{{if and $mainProfile $swapProfile}}
+  {{$mainData := $mainProfile.Value}} 
+  {{$swapData := $swapProfile.Value}}
+
+  {{dbSet $userID "profilemain" $swapData}}
+  {{dbSet $userID $profileKey $mainData}}
+
+  **O perfil `profile{{$profileNum}}` foi trocado com o perfil principal com sucesso!**
+{{else}}
+  **Erro: Um ou ambos os perfis não existem!**
+{{end}}
