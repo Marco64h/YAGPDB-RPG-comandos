@@ -1,4 +1,5 @@
 //Este comando serve para mostrar seu dinheiro, para setar um valor de dinheiro a outro jogador basta usar "Editar valores"
+//Uma moeda de ouro equivale a 100, uma moeda de prata equivale a 10, uma moeda de cobre equivale a 1
 //Caso você queira setar um valor para um usuário basta usar, caso seja o mesmo prefixo: <set @Usuário Cash 2
 //Novamente, caso queira setar o valor salvo em outro slot basta especifica-lo por ultimo: <set @Usuário Cash 2 2
 
