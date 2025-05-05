@@ -1,3 +1,7 @@
+//Use este comando para dar dano ou curar um alvo
+//Caso você use os mesmos prefixos, basta usar o comando a seguir para curar: >> @Usuário 100
+//Parar curar é a mesma coisa só que negativo >> @Usuário -100
+
 {{$ln := (len .Args)}}
 {{if gt $ln 1}}
   {{$1 := (index .Args 1)}}
