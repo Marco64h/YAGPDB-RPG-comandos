@@ -18,31 +18,31 @@
 {{$races:= sdict "humano" $humano "elfo" $elfo "hobbit" $hobbit "anão" $anão "tritão" $tritão "transmorfo" $transmorfo "druida" $druida "ogro" $ogro "aesir" $aesir "yokai" $yokai}}
 {{if gt $ln 1}}
   {{$1 := (index .Args 1)}}
-  {{if ($user := userArg $1)}}  
-  {{if gt $ln 2}}     
- {{$2 := (index .Args 2)}}   
-   {{if ($races.Get (lower $2))}}    
-    {{if gt $ln 3}}       
-   {{$3 := (index .Args 3)}} 
-         {{$profileK := printf "profile%d" (toInt $3)}}   
-       {{$stats := ($races.Get (lower $2))}} 
-         {{dbSet (toInt64 $user.ID) $profileK $stats}}
+  {{if ($user := userArg $1)}}
+    {{if gt $ln 2}}     
+      {{$2 := (index .Args 2)}}   
+      {{if ($races.Get (lower $2))}}    
+        {{if gt $ln 3}}       
+          {{$3 := (index .Args 3)}} 
+          {{$profileK := printf "profile%d" (toInt $3)}}   
+          {{$stats := ($races.Get (lower $2))}} 
+          {{dbSet (toInt64 $user.ID) $profileK $stats}}
           {{sendMessage nil (print "**Perfil de " $user.Username " criado com status base de: " $2 "**")}}
           {{sendMessage nil (print "**Perfil criado em; __" $profileK "__**")}} 
-       {{else}}   
-       {{$stats := ($races.Get (lower $2))}} 
-         {{dbSet (toInt64 $user.ID) "profilemain" $stats}}
+        {{else}}   
+          {{$stats := ($races.Get (lower $2))}} 
+          {{dbSet (toInt64 $user.ID) "profilemain" $stats}}
           {{sendMessage nil (print "**Perfil de " $user.Username " criado com status base de: " $2 "**")}} 
-       {{end}}
+        {{end}}
       {{else}}   
-     {{sendMessage nil "> **Linhagem Incorreta.****__Lista de Opções:__ Humano, Elfo, Hobbit, Anão, Tritão, Druida, Transmorfo, Yokai, Aesir & Ogro.**"}}  
-    {{end}}   
- {{else}}     
- {{sendMessage nil "**__Você não especificou uma linhagem!__**\n**__Lista de Opções:__**\n**Humano, Elfo, Hobbit, Anão, Tritão, Druida, Transmorfo, Yokai, Aesir & Ogro.**"}}
+        {{sendMessage nil "> **Linhagem Incorreta.****__Lista de Opções:__ Humano, Elfo, Hobbit, Anão, Tritão, Druida, Transmorfo, Yokai, Aesir & Ogro.**"}}  
+      {{end}}   
+    {{else}}     
+      {{sendMessage nil "**__Você não especificou uma linhagem!__**\n**__Lista de Opções:__**\n**Humano, Elfo, Hobbit, Anão, Tritão, Druida, Transmorfo, Yokai, Aesir & Ogro.**"}}
     {{end}}
   {{else}}
     {{sendMessage nil "> Usuário inválido!"}}
   {{end}}
 {{else}} 
- {{sendMessage nil "> **Você não mencionou ninguém.**"}}
+{{sendMessage nil "> **Você não mencionou ninguém.**"}}
 {{end}}
