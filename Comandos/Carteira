@@ -1,0 +1,114 @@
+//Este comando serve para mostrar seu dinheiro, para setar um valor de dinheiro a outro jogador basta usar "Editar valores"
+//Caso você queira setar um valor para um usuário basta usar, caso seja o mesmo prefixo: <set @Usuário Cash 2
+//Novamente, caso queira setar o valor salvo em outro slot basta especifica-lo por ultimo: <set @Usuário Cash 2 2
+
+//Para ver a sua carteira, caso seja o mesmo prefixo, basta usar: <carteira
+//Para ver o de outra pessoa, utilize: <carteira @Usuário
+//Para ver o seu ou de outra pessoa em outro SLOT, use: <carteira @Usuário 2
+
+{{$ln := (len .Args)}}
+	{{if gt $ln 2}}
+	{{$2 := (index .Args 2)}}
+	{{$profileK := printf "profile%d" (toInt $2)}}
+	{{$1 := (index .Args 1)}}
+		{{if ($user := userArg $1)}}
+		{{$id := toInt64 $user.ID}}
+			{{if (dbGet $id $profileK)}}
+			{{$profileD := (dbGet $id $profileK).Value}}
+			{{$stats := sdict $profileD}}
+
+			{{$color := randInt 0 16777215}}
+			{{$colorcheck := ($stats.Get "cor")}}
+				{{if $colorcheck}}
+				{{$color = ($stats.Get "cor")}}
+				{{end}}
+			{{$color = toInt $color}}
+	
+				{{$cash := toInt ($stats.Get "Cash")}}
+				{{$ouro := (toInt ($ouro := div $cash 100))}}
+				{{$resto := mod $cash 100}}
+
+				{{$prata := (toInt ($prata := div $resto 10))}}
+				{{$cobre := (toInt ($cobre := mod $resto 10))}}
+
+
+				{{$convert1 := printf "%d Ouro" $ouro}}
+				{{$convert2 := printf "%d Prata" $prata}}
+				{{$convert3 := printf "%d Cobre" $cobre}}
+
+				{{$embed := cembed "title" (joinStr "" ($stats.Get "nome")) "description" (joinStr "" "\n**```ansi\n💰 [2;36m⊰⩥[2;30m【[2;35mCash: \n[2;33m" ( $convert1 ) "\n[2;30m" ( $convert2 ) "\n[2;31m" ( $convert3 ) "[2;30m```**") "thumbnail" (sdict "url" ($stats.Get "foto")) "color" $color}}
+				{{sendMessage nil $embed}}
+			{{else}}
+			{{$msg1 := (joinStr "" "**Não há nenhum um profile salvo neste Slot! __" $profileK "__**")}}
+			{{sendMessage nil $msg1}}
+			{{end}}
+		{{else}}> **Menção inválida!**
+		{{end}}
+
+	{{else}}
+		{{if gt $ln 1}}
+		{{$1 := (index .Args 1)}}
+		{{$user := userArg $1}}
+		{{$id := toInt64 $user.ID}}
+			{{if ($user := userArg $1)}}
+			{{$id := toInt64 $user.ID}}
+				{{if (dbGet $id "profilemain")}}
+				{{$status := (dbGet $id "profilemain").Value}}
+				{{$stats := sdict $status}}
+
+				{{$color := randInt 0 16777215}}
+				{{$colorcheck := ($stats.Get "cor")}}
+					{{if $colorcheck}}
+					{{$color = ($stats.Get "cor")}}
+					{{end}}
+				{{$color = toInt $color}}
+		
+				{{$cash := toInt ($stats.Get "Cash")}}
+				{{$ouro := (toInt ($ouro := div $cash 100))}}
+				{{$resto := mod $cash 100}}
+
+				{{$prata := (toInt ($prata := div $resto 10))}}
+				{{$cobre := (toInt ($cobre := mod $resto 10))}}
+
+				{{$convert1 := printf "%d Ouro" $ouro}}
+				{{$convert2 := printf "%d Prata" $prata}}
+				{{$convert3 := printf "%d Cobre" $cobre}}	
+
+				{{$embed := cembed "title" (joinStr "" ($stats.Get "nome")) "description" (joinStr "" "\n**```ansi\n💰 [2;36m⊰⩥[2;30m【[2;35mCash: \n[2;33m" ( $convert1 ) "\n[2;30m" ( $convert2 ) "\n[2;31m" ( $convert3 ) "[2;30m```**") "thumbnail" (sdict "url" ($stats.Get "foto")) "color" $color}}
+					{{sendMessage nil $embed}}
+				{{else}}> **A pessoa mencionada não tem um perfil! Peça para um `Administrador` fazer um!**
+				{{end}}
+			{{else}}> **Usuário inválido**
+			{{end}}
+
+		{{else}}
+		{{$id := toInt64 .User.ID}}
+			{{if (dbGet $id "profilemain")}}
+			{{$status := (dbGet $id "profilemain").Value}}
+			{{$stats := sdict $status}}
+
+			{{$color := randInt 0 16777215}}
+			{{$cor := ($stats.Get "cor")}}
+				{{if $cor}}
+				{{$color = ($stats.Get "cor")}}
+				{{end}}
+			{{$color = toInt $color}}
+			
+			{{$cash := toInt ($stats.Get "Cash")}}
+				{{$ouro := (toInt ($ouro := div $cash 100))}}
+				{{$resto := mod $cash 100}}
+
+				{{$prata := (toInt ($prata := div $resto 10))}}
+				{{$cobre := (toInt ($cobre := mod $resto 10))}}
+
+				{{$convert1 := printf "%d Ouro" $ouro}}
+				{{$convert2 := printf "%d Prata" $prata}}
+				{{$convert3 := printf "%d Cobre" $cobre}}	
+
+				{{$embed := cembed "title" (joinStr "" ($stats.Get "nome")) "description" (joinStr "" "\n**```ansi\n💰 [2;36m⊰⩥[2;30m【[2;35mCash: \n[2;33m" ( $convert1 ) "\n[2;30m" ( $convert2 ) "\n[2;31m" ( $convert3 ) "[2;30m```**") "thumbnail" (sdict "url" ($stats.Get "foto")) "color" $color}}
+				{{sendMessage nil $embed}}
+
+			{{else}}> **Você não tem um perfil! Peça para um `Administrador` fazer um para você!**
+			{{end}}
+		{{end}}
+	{{end}}
