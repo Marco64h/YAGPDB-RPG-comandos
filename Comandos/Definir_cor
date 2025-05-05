@@ -1,0 +1,48 @@
+//Serve para mudar a cor que fica na borda do Embed em seu profile. No entanto, escolha um cor de 0 a 16777215
+//Caso seja o mesmo prefixo, basta usar: <color 124912
+//Caso seja para outro slot basta especificar o SLOT por ultimo: <color 1241454 2
+//Peça para alguma IA gerar uma cor nesse código caso você não saiba
+
+{{$ln := (len .Args)}}
+{{$id := (toInt64 .User.ID)}}
+{{if gt $ln 2}}
+	{{$2 := (index .Args 2)}}
+	{{$1 := (index .Args 1)}}
+	{{$cor := toInt $1}}
+	{{if and (ge $cor 0) (le $cor 16777215)}}
+	{{$profileK := printf "profile%d" (toInt $2)}}
+ 	{{$exist := dbGet $id $profileK}}
+		{{if $exist}}
+		{{$profile := sdict $exist.Value}}
+		{{$profile.Set "cor" $cor}}
+		{{dbSet $id $profileK $profile}}
+		{{$msg2 := (joinStr "" "**Cor salva no __" $profileK "__**")}}
+		{{sendMessage nil $msg2}}
+		{{else}}
+		{{$msg1 := (joinStr "" "**Não existe um perfil neste Slot!" $profileK "**")}}
+		{{sendMessage nil $msg1}}
+		{{end}}
+		{{else}}
+		**O número está fora do intervalo esperado! __0 a 16777215__**
+		{{end}}
+	{{else}}
+{{if gt $ln 1}}
+{{$1 := (index .Args 1)}}
+{{$cor := toInt $1}}
+{{if and (ge $cor 0) (le $cor 16777215)}}
+{{$exist := dbGet $id "profilemain"}}
+	{{if $exist}}
+	{{$profile := sdict $exist.Value}}
+	{{$profile.Set "cor" $cor}}
+	{{dbSet $id "profilemain" $profile}}
+	**Cor salva no perfil principal com sucesso!**
+	{{else}}
+	**Você não tem um perfil!**
+	{{end}}
+{{else}}
+**O número está fora do intervalo esperado! __0 a 16777215__**
+{{end}}
+{{else}}
+**Você não especificou nada! O uso correto do comando é: <color __<numero da cor>__ __<Slot(opcional)>__**
+{{end}}
+{{end}}
