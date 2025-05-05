@@ -1,0 +1,21 @@
+//O comando cura seu MP e HP para o máximo salvo em seu perfil
+//Caso use o mesmo prefixo, basta usar: <recover
+
+{{$id := toInt64 .User.ID}}
+{{if (dbGet $id "profilemain")}}
+  {{$status := (dbGet $id "profilemain").Value}}
+  {{$stats := sdict $status}}
+  
+  {{$MaxHP := $stats.Get "MaxHP"}}
+  {{$stats.Set "HP" $MaxHP}}
+  
+  {{$MaxEnergia := $stats.Get "MaxEnergia"}}
+  {{$stats.Set "Energia" $MaxEnergia}}
+  
+  {{dbSet $id "profilemain" $stats}}
+  
+  {{$ActionLog := cembed "title" "**Recover**" "description" (joinStr "" ":two_hearts: **`Corpo de " .User.Username " totalmente recuperado!`**") "color" 11748677}}
+  {{sendMessage nil $ActionLog}}
+{{else}}
+  **`Você não tem um perfil!`**
+{{end}}
