@@ -1,0 +1,31 @@
+//Este comando não precisa ser executado por um comando, ele vai funcionar sempre que <profiles for utilizado
+
+{{$user := .User.ID}}
+{{$data := dbGet $user "profile_msg"}}
+{{if $data}}
+  {{$d := sdict $data.Value}}
+  {{if eq .Message.ID $d.msgID}}
+    {{$count := $d.count}}
+
+    {{if eq .Reaction.Emoji.Name "👉"}}
+      {{$count = add $count 1}}
+    {{else if eq .Reaction.Emoji.Name "👈"}}
+      {{$count = sub $count 1}}
+    {{end}}
+
+    {{$profileK := printf "profile%d" $count}}
+    {{$profile := dbGet $user $profileK}}
+    {{if $profile}}
+      {{$stats := sdict $profile.Value}}
+      {{$color := or ($stats.Get "cor") (randInt 0 16777215)}}
+	
+      {{$embed := cembed "title" (joinStr "" ($stats.Get "nome") " | " $profileK) "description" (joinStr "" "**```ansi\n[2;30m┏━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┓\n[2;30m┣💗[2;38m⊰⩥[2;30m❪[2;35mHP[2;30m❫『[2;31m" ($stats.Get "HP") " [2;30m| [2;31m" ($stats.Get "MaxHP") "[2;30m』\n┣🔵[2;38m⊰⩥[2;30m❪[2;36mMP[2;30m❫『[2;34m" ($stats.Get "Energia") " [2;30m| [2;34m" ($stats.Get "MaxEnergia") "[2;30m』\n┣💠[2;38m⊰⩥[2;30m❪[2;32mRD[2;30m❫『[2;33m" ($stats.Get "RD") "% [2;30m| [2;33m" ($stats.Get "Escudo") "[2;30m』\n┗━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┛```**" "\n**```ansi\n[2;36m🌐⊰⩥[2;30m【[2;33m𝐍𝐢𝐯𝐞𝐥: [2;37m" ($stats.Get "Nivel") "[2;30m】\n🧠[2;36m⊰⩥[2;30m【[2;35m𝐒𝐚𝐧𝐢𝐝𝐚𝐝𝐞: [2;37m" ($stats.Get "Sanidade") "[2;30m】```**" "\n**```ansi\n[2;30m╭──────────────────╮\n[2;30m│👊[2;38m⊰⩥[2;34m「[2;31mForça: [2;37m" ($stats.Get "DanoFis") "\n[2;30m│✨️[2;38m⊰⩥[2;34m「[2;36mPoder: [2;37m" ($stats.Get "DanoMa") "\n[2;30m╰──────────────────╯```**") "thumbnail" (sdict "url" ($stats.Get "foto")) "color" $color}}
+      {{editMessage nil $d.msgID $embed}}
+      {{dbSet $user "profile_msg" (sdict "msgID" $d.msgID "count" $count)}}
+	{{else}}
+	{{$embedfail := cembed "description" (print ":x: Perfil não encontrado: " $profileK) "color" 15158332}}
+	{{editMessage nil $d.msgID $embedfail}}
+      {{dbSet $user "profile_msg" (sdict "msgID" $d.msgID "count" $count)}}
+    {{end}}
+  {{end}}
+{{end}}
