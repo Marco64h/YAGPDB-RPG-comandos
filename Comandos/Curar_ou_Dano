@@ -1,0 +1,42 @@
+{{$ln := (len .Args)}}
+{{if gt $ln 1}}
+  {{$1 := (index .Args 1)}}
+	{{if ($user := userArg $1)}}
+		{{if gt $ln 2}}
+		  {{$2 := (index .Args 2)}}
+			{{if (toInt $2)}}
+			  {{$damageOrHeal := toInt $2}}
+			  {{$targetStats := (dbGet (toInt64 $user.ID) "profilemain").Value}}
+			  {{$targetname := ((sdict $targetStats).Get "nome")}}
+			  {{$targetHP := toInt ((sdict $targetStats).Get "HP")}}
+	  		{{$maxHP := toInt ((sdict $targetStats).Get "MaxHP")}}
+			  {{$userstats := (dbGet (toInt64 .User.ID) "profilemain").Value}}
+			  {{$username := ((sdict $userstats).Get "nome")}}
+		  	{{$newHP := add $targetHP $damageOrHeal}}
+				  {{if lt $damageOrHeal 0}}
+					  {{if le $newHP 0}}
+			  		  {{$newHP = 0}}
+					  {{end}}
+				  {{else}}
+				    {{if gt $newHP $maxHP}}
+		  			  {{$newHP = $maxHP}}
+					  {{end}}
+					{{end}}
+				{{$mappedStats := (sdict $targetStats)}}
+				{{$mappedStats.Set "HP" $newHP}}
+				{{dbSet (toInt64 $user.ID) "profilemain" $mappedStats}}
+					{{if lt $damageOrHeal 0}}
+					  {{$actionLog := cembed "title" "Log de Batalha" "description" (joinStr "" "💔 " $username " retirou " (mult $damageOrHeal -1) " de HP de " $targetname ". Agora ele(a) tem " $newHP " de HP.")}}
+						{{sendMessage nil $actionLog}}
+					{{else}}
+						{{$actionLog := cembed "title" "Log de Batalha" "description" (joinStr "" "💖 " $username " recuperou " $damageOrHeal " de HP de " $targetname ". Agora ele(a) tem " $newHP " de HP.")}}
+						 {{sendMessage nil $actionLog}}
+					{{end}}
+				{{else}}> **`{{$2}}` não é um número válido!**
+				{{end}}
+			{{else}}> **Você não definiu uma quantidade válida de Dano/Recuperação!**
+			{{end}}
+		{{else}}> **Menção inválida!**
+		{{end}}
+	{{else}}> **Você não mencionou um alvo!**
+	{{end}}
