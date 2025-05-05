@@ -1,0 +1,110 @@
+//Este comando é meio complicado de se usar, mas ele conta automaticamente o dano salvo em seu perfil e você precisa definir outras coisas
+//Caso seja o mesmo prefixo, basta usar >f @Usuário 1.5 10 2 10
+//O comando funciona da seguinte forma >f (Menção) (Multiplicador) (Dano extra) (Quanto de escudo passa) (Quanto de RD passa)
+//O multiplicador multiplica o dano BASE então o dano extra não é multiplicado.
+//O escudo é contado antes do RD (Redução de Dano)
+
+{{$ln := (len .Args)}}
+	{{if gt $ln 1}}
+	{{$1 := (index .Args 1)}}
+		{{if $user := userArg $1}}
+		{{$damageBonus := 0}}
+		{{$mult := 0.0}}
+		{{$pasRD := 0}}
+		{{$pasSH := 0}}
+			{{if gt $ln 2}}
+			{{$2 := (index .Args 2)}}
+				{{if (toInt $2)}}
+				{{$damageBonus = toInt $2}}
+				{{end}}
+			{{end}}
+		{{if gt $ln 3}}
+		{{$3 := (index .Args 3)}}
+		{{$mult = toFloat $3}}
+		{{end}}
+		{{if gt $ln 4}}
+		{{$4 := (index .Args 4)}}
+		{{$pasSH = toInt $4}}
+		{{end}}
+		{{if gt $ln 5}}
+		{{$5 := (index .Args 5)}}
+		{{$pasRD = toInt $5}}
+		{{end}}
+    
+	{{$userstats := (dbGet (toInt64 .User.ID) "profilemain").Value}}
+	{{$username := ((sdict $userstats).Get "nome")}}    
+	{{$DanoFisico := ((sdict $userstats).Get "DanoFis")}}   
+
+	{{$targetStats := (dbGet (toInt64 $user.ID) "profilemain").Value}}
+	{{$targetHP := toInt ((sdict $targetStats).Get "HP")}}
+	{{$Escudo := toInt ((sdict $targetStats).Get "Escudo")}}
+	{{$RD := toInt ((sdict $targetStats).Get "RD")}}
+	{{$maxHP := toInt ((sdict $targetStats).Get "MaxHP")}}
+	{{$targetname := ((sdict $targetStats).Get "nome")}}
+
+		{{if gt $mult 0.0}}
+		{{$DanoFisico = toFloat $DanoFisico}}
+		{{$DanoFisico = mult $DanoFisico $mult}}
+		{{$DanoFisico = toInt $DanoFisico}}
+		{{end}}
+		{{if gt $pasRD 0}}
+		{{$RD = sub $RD $pasRD}}
+			{{if lt $RD 0}}
+			{{$RD = 0}}
+			{{end}}
+		{{end}}
+		{{if gt $pasSH 0}}
+		{{$Escudo = sub $Escudo $pasSH}}
+			{{if lt $Escudo 0}}
+			{{$Escudo = 0}}
+			{{end}}
+		{{end}}
+
+	{{$damage := add $DanoFisico $damageBonus}}		
+		{{if le $damage 0}}
+		{{$damage = 0}}
+		{{end}}
+
+	{{if gt $damage 0}}
+		{{if gt $Escudo 0}}
+			{{$damage = sub $damage $Escudo}}
+			{{if lt $damage 0}}
+			{{$damage = 0}}
+			{{end}}
+		{{end}}
+	{{end}}
+    
+		{{if gt $damage 0}}
+			{{if gt $RD 0}}
+			{{$damagereal := mult $damage $RD}}
+			{{$damagereal = div $damagereal 100}}
+			{{$damage = sub $damage $damagereal}}
+			{{end}}
+		{{end}}
+  
+		{{if gt $damage 0}}
+		{{$damage = mult $damage -1}}
+		{{end}}
+    
+	{{$newHP := add $targetHP $damage}}
+		{{if lt $damage 0}}
+			{{if le $newHP 0}}
+			{{$newHP = 0}}
+			{{end}}
+		{{end}}
+    
+	{{$mappedStats := (sdict $targetStats)}}
+	{{$mappedStats.Set "HP" $newHP}}
+	{{dbSet (toInt64 $user.ID) "profilemain" $mappedStats}}
+    
+		{{if le $damage 0}}
+			{{$actionLog := cembed "title" "Log de Batalha" "description" (joinStr "" "💔 " $username " retirou " (mult $damage -1) " de HP de " $targetname " usando ataques FÍSICOS!. Agora ele(a) tem " $newHP " de HP.")}}
+			{{sendMessage nil $actionLog}}
+		{{end}}
+	{{else}}
+**Menção inválida!**
+	{{end}}
+	{{else}}
+**Você não mencionou um alvo!**
+**O Comando funciona da seguinte forma; >f __<menção> <dano BONUS>__ __<multiplicador>__ __<Quanto passa de ESCUDO>__ __<Quanto passa de DRRE>__**
+{{end}}
