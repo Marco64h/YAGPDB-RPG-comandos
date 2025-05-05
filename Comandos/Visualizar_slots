@@ -1,0 +1,22 @@
+//Este comando serve para ver seus SLOTS salvos, você vai precisar viajar entre cada unidade, então evite salvar em números muito altos
+//Este comando só funciona caso você utilize o outro em conjunto.
+//Caso seja o mesmo prefixo, basta usar: <profiles
+//Para navegar basta clicar nos emojis
+
+{{$user := .User.ID}}
+{{$profileK := "profile1"}}
+{{$profile := dbGet $user $profileK}}
+
+{{if $profile}}
+  {{$stats := sdict $profile.Value}}
+  {{$color := or ($stats.Get "cor") (randInt 0 16777215)}}
+  {{$embed := cembed "title" (joinStr "" ($stats.Get "nome") " | " $profileK) "description" (joinStr "" "**```ansi\n[2;30m┏━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┓\n[2;30m┣💗[2;38m⊰⩥[2;30m❪[2;35mHP[2;30m❫『[2;31m" ($stats.Get "HP") " [2;30m| [2;31m" ($stats.Get "MaxHP") "[2;30m』\n┣🔵[2;38m⊰⩥[2;30m❪[2;36mMP[2;30m❫『[2;34m" ($stats.Get "Energia") " [2;30m| [2;34m" ($stats.Get "MaxEnergia") "[2;30m』\n┣💠[2;38m⊰⩥[2;30m❪[2;32mRD[2;30m❫『[2;33m" ($stats.Get "RD") "% [2;30m| [2;33m" ($stats.Get "Escudo") "[2;30m』\n┗━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┛```**" "\n**```ansi\n[2;36m🌐⊰⩥[2;30m【[2;33m𝐍𝐢𝐯𝐞𝐥: [2;37m" ($stats.Get "Nivel") "[2;30m】\n🧠[2;36m⊰⩥[2;30m【[2;35m𝐒𝐚𝐧𝐢𝐝𝐚𝐝𝐞: [2;37m" ($stats.Get "Sanidade") "[2;30m】```**" "\n**```ansi\n[2;30m╭──────────────────╮\n[2;30m│👊[2;38m⊰⩥[2;34m「[2;31mForça: [2;37m" ($stats.Get "DanoFis") "\n[2;30m│✨️[2;38m⊰⩥[2;34m「[2;36mPoder: [2;37m" ($stats.Get "DanoMa") "\n[2;30m╰──────────────────╯```**") "thumbnail" (sdict "url" ($stats.Get "foto")) "color" $color}}
+  {{$msgID := sendMessageRetID nil $embed}}
+  {{dbSet $user "profile_msg" (sdict "msgID" $msgID "count" 1)}}
+  {{addMessageReactions nil $msgID "👈" "👉"}}
+{{else}}
+  {{$embedfail := cembed "description" (print ":x: Perfil não encontrado: " $profileK) "color" 15158332}}
+  {{$msgID := sendMessageRetID nil $embedfail}}
+  {{dbSet $user "profile_msg" (sdict "msgID" $msgID "count" 1)}}
+  {{addMessageReactions nil $msgID "👈" "👉"}}
+{{end}}
