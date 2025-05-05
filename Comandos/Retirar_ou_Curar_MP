@@ -1,0 +1,75 @@
+//Segue a mesma lógica que o de HP, a diferença é que conta no MP
+//Novamente, caso use os mesmos prefixos, basta usar para curar (Ter 100 ou +100 não faz diferença): << @Usuário 100
+//E para retirar, a mesma coisa que dano: << @Usuário -100
+
+{{$ln := (len .Args)}}
+	{{if gt $ln 1}}
+	{{$1 := (index .Args 1)}}
+		{{if ($user := userArg $1)}}
+			{{if gt $ln 2}}
+			{{$2 := (index .Args 2)}}
+				{{if (toInt $2)}}
+					{{if lt (toInt $2) 0}}
+					{{/* DANO */}}
+					{{$targetStats := (dbGet (toInt64 $user.ID) "profilemain").Value}}
+					{{$targetEnergia := (sdict $targetStats).Get "Energia"}}
+					{{$targetname := ((sdict $targetStats).Get "nome")}}
+
+					{{$userstats := (dbGet (toInt64 .User.ID) "profilemain").Value}}
+					{{$username := ((sdict $userstats).Get "nome")}}
+
+					{{$mappedStats := (sdict $targetStats)}}
+					{{$mappedStats.Set "Energia" (add $targetEnergia (toInt $2))}}
+					{{$verifyEnergia := $mappedStats.Get "Energia"}}
+					{{/* VERIFICANDO SE MORREU */}}
+						{{if le $verifyEnergia 0}}
+						{{$mappedStats.Set "Energia" 0}}
+						{{dbSet (toInt64 $user.ID) "profilemain" $mappedStats}}
+						{{$ActionLog := cembed "title" "Log de Batalha" "description" (joinStr "" "🔥 " $username " Retirou __" (mult (toInt $2) -1) " da Energia de__ " $targetname "! \n 😨 " $targetname " Ficou com __0 de Mana__ Restante! \n 😱 __" $targetname " Fica Vulnerável!__")}}
+						{{sendMessage nil $ActionLog}}
+						{{else}}
+						{{$mappedStats.Set "Energia" (add $targetEnergia (toInt $2))}}
+						{{dbSet (toInt64 $user.ID) "profilemain" $mappedStats}}
+						{{$ActionLog := cembed "title" "Log de Batalha" "description" (joinStr "" "🔥 " $username " Retirou __" (mult (toInt $2) -1) " da Mana__  de " $targetname "! \n 🌀 " $targetname " Ficou com __" $verifyEnergia "__ de Mana! ") "color" 11748677}}
+						{{sendMessage nil $ActionLog}}
+						{{end}}
+					{{else}}
+					{{/* CURA */}}
+					{{$targetStats := (dbGet (toInt64 $user.ID) "profilemain").Value}}
+					{{$targetEnergia := (sdict $targetStats).Get "Energia"}}
+					{{$targetMaxEnergia := (sdict $targetStats).Get "MaxEnergia"}}
+					{{$targetname := ((sdict $targetStats).Get "nome")}}
+
+					{{$userstats := (dbGet (toInt64 .User.ID) "profilemain").Value}}
+					{{$username := ((sdict $userstats).Get "nome")}}
+
+					{{$mappedStats := (sdict $targetStats)}}
+					{{$mappedStats.Set "Energia" (add $targetEnergia (toInt $2))}}
+					{{$verifyEnergia := $mappedStats.Get "Energia"}}
+					{{/* VERIFICANDO SE HOUVE OVERHEAL */}}
+					{{$verifyEnergia := (toInt64 $verifyEnergia)}}
+					{{$targetMaxEnergia := (toInt64 $targetMaxEnergia)}}
+						{{if gt $verifyEnergia $targetMaxEnergia}}
+						{{$mappedStats.Set "Energia" $targetMaxEnergia}}
+						{{dbSet (toInt64 $user.ID) "profilemain" $mappedStats}}
+						{{$ActionLog := cembed "title" "Log de Batalha" "description" (joinStr "" "🔥 " $username " Recuperou __" (toInt $2) " Mana__  de " $targetname "! \n 🧘 " $targetname " Teve a __Mana Totalmente Restaurada__! (" $targetMaxEnergia ")" ) "color" 16758241}}
+						{{sendMessage nil $ActionLog}}
+						{{else}}
+						{{$mappedStats.Set "Energia" (add $targetEnergia (toInt $2))}}
+						{{dbSet (toInt64 $user.ID) "profilemain" $mappedStats}}
+						{{$ActionLog := cembed "title" "Log de Batalha" "description" (joinStr "" "⚡ " $username " Recuperou __" (toInt $2) " Mana__  de " $targetname "! \n 🔥 " $targetname " Recuperou sua Mana __" $verifyEnergia "__ Restante!") "color" 16758241}}
+						{{sendMessage nil $ActionLog}}
+						{{end}}
+					{{end}}
+				{{else}}
+> **`{{$2}}` não é um número!**
+				{{end}}
+			{{else}}
+> **Você não definiu uma quantidade válida de Dano/Recuperação!**
+			{{end}}
+		{{else}}
+> **Menção inválida!**
+		{{end}}
+	{{else}}
+> **Você não mencionou um alvo!**
+	{{end}}
