@@ -1,4 +1,5 @@
-//Este comando não precisa ser executado por um comando, ele vai funcionar sempre que <profiles for utilizado
+//Este código não precisa ser executado por um comando, ele vai funcionar sempre que <profiles for utilizado
+//Este código precisa ser classificado com Reactions em vez de Command, caso contrário n vai funcionar
 
 {{$user := .User.ID}}
 {{$data := dbGet $user "profile_msg"}}
