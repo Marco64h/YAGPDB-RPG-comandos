@@ -4,26 +4,36 @@
 //Caso queira ver o seu profile ou de outra pessoa que esta salvo em outro SLOT, basta usar: <profile @Usuário 2
 
 {{$ln := (len .Args)}}
-{{$nil := (joinStr "" "[REDACTED]")}}
+{{ $stats := .stats}}
+{{ $color := .color}}
+{{ $profileK := .profileK}}
+{{ $user := .user}}
+{{ $slot := false}}
+{{ $id := .id}}
+{{$title := .titl}}
+{{$descricao := .desc}}
+{{$1 := .um}}
+{{$check := false}}
+
 	{{if gt $ln 2}}
 	{{$2 := (index .Args 2)}}
-	{{$profileK := printf "profile%d" (toInt $2)}}
+	{{$profileK = printf "profile%d" (toInt $2)}}
 	{{$1 := (index .Args 1)}}
-		{{if ($user := userArg $1)}}
-		{{$id := toInt64 $user.ID}}
+		{{if ($user = userArg $1)}}
+		{{$id = toInt64 $user.ID}}
 			{{if (dbGet $id $profileK)}}
 			{{$profileD := (dbGet $id $profileK).Value}}
-			{{$stats := sdict $profileD}}
+			{{$slot = true}}
+			{{$stats = sdict $profileD}}
 
-			{{$color := randInt 0 16777215}}
+			{{$color = randInt 0 16777215}}
 			{{$colorcheck := ($stats.Get "cor")}}
 				{{if $colorcheck}}
 				{{$color = ($stats.Get "cor")}}
 				{{end}}
 			{{$color = toInt $color}}
+			{{$check = true}}
 
-				{{$embed := cembed "title" (joinStr "" ($stats.Get "nome")) "description" (joinStr "" "**```ansi\n[2;30m┏━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┓\n[2;30m┣💗[2;38m⊰⩥[2;30m❪[2;35mHP[2;30m❫『[2;31m" ($stats.Get "HP") " [2;30m| [2;31m" ($stats.Get "MaxHP") "[2;30m』\n┣🔵[2;38m⊰⩥[2;30m❪[2;36mMP[2;30m❫『[2;34m" ($stats.Get "Energia") " [2;30m| [2;34m" ($stats.Get "MaxEnergia") "[2;30m』\n┣💠[2;38m⊰⩥[2;30m❪[2;32mRD[2;30m❫『[2;33m" ($stats.Get "RD") "% [2;30m| [2;33m" ($stats.Get "Escudo") "[2;30m』\n┗━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┛```**" "\n**```ansi\n[2;36m🌐⊰⩥[2;30m【[2;33m𝐍𝐢𝐯𝐞𝐥: [2;37m" ($stats.Get "Nivel") "[2;30m】\n🧠[2;36m⊰⩥[2;30m【[2;35m𝐒𝐚𝐧𝐢𝐝𝐚𝐝𝐞: [2;37m" ($stats.Get "Sanidade") "[2;30m】```**" "\n**```ansi\n[2;30m╭──────────────────╮\n[2;30m│👊[2;38m⊰⩥[2;34m「[2;31mForça: [2;37m" ($stats.Get "DanoFis") "\n[2;30m│✨️[2;38m⊰⩥[2;34m「[2;36mPoder: [2;37m" ($stats.Get "DanoMa") "\n[2;30m╰──────────────────╯```**") "thumbnail" (sdict "url" ($stats.Get "foto")) "color" $color}}
-				{{sendMessage nil $embed}}
 			{{else}}
 			{{$msg1 := (joinStr "" "**Não há nenhum um profile salvo neste Slot! __" $profileK "__**")}}
 			{{sendMessage nil $msg1}}
@@ -33,47 +43,67 @@
 
 	{{else}}
 		{{if gt $ln 1}}
-		{{$1 := (index .Args 1)}}
-		{{$user := userArg $1}}
-		{{$id := toInt64 $user.ID}}
-			{{if ($user := userArg $1)}}
-			{{$id := toInt64 $user.ID}}
+		{{$1 = (index .Args 1)}}
+		{{$user = userArg $1}}
+		{{$id = toInt64 $user.ID}}
+			{{if ($user = userArg $1)}}
 				{{if (dbGet $id "profilemain")}}
 				{{$status := (dbGet $id "profilemain").Value}}
-				{{$stats := sdict $status}}
+				{{$stats = sdict $status}}
 
-				{{$color := randInt 0 16777215}}
+				{{$color = randInt 0 16777215}}
 				{{$colorcheck := ($stats.Get "cor")}}
 					{{if $colorcheck}}
 					{{$color = ($stats.Get "cor")}}
 					{{end}}
 				{{$color = toInt $color}}
+				{{$check = true}}
 
-				{{$hide := toInt ($stats.Get "hide")}}
-					{{$embed := cembed "title" (joinStr ""  ($stats.Get "nome")) "description" (joinStr "" "**```ansi\n[2;30m┏━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┓\n[2;30m┣💗[2;38m⊰⩥[2;30m❪[2;35mHP[2;30m❫『[2;31m" ($stats.Get "HP") " [2;30m| [2;31m" ($stats.Get "MaxHP") "[2;30m』\n┣🔵[2;38m⊰⩥[2;30m❪[2;36mMP[2;30m❫『[2;34m" ($stats.Get "Energia") " [2;30m| [2;34m" ($stats.Get "MaxEnergia") "[2;30m』\n┣💠[2;38m⊰⩥[2;30m❪[2;32mRD[2;30m❫『[2;33m" ($stats.Get "RD") "% [2;30m| [2;33m" ($stats.Get "Escudo") "[2;30m』\n┗━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┛```**" "\n**```ansi\n[2;36m🌐⊰⩥[2;30m【[2;33m𝐍𝐢𝐯𝐞𝐥: [2;37m" ($stats.Get "Nivel") "[2;30m】\n🧠[2;36m⊰⩥[2;30m【[2;35m𝐒𝐚𝐧𝐢𝐝𝐚𝐝𝐞: [2;37m" ($stats.Get "Sanidade") "[2;30m】```**" "\n**```ansi\n[2;30m╭──────────────────╮\n[2;30m│👊[2;38m⊰⩥[2;34m「[2;31mForça: [2;37m" ($stats.Get "DanoFis") "\n[2;30m│✨️[2;38m⊰⩥[2;34m「[2;36mPoder: [2;37m" ($stats.Get "DanoMa") "\n[2;30m╰──────────────────╯```**") "thumbnail" (sdict "url" ($stats.Get "foto")) "color" $color}}
-					{{sendMessage nil $embed}}
 				{{else}}> **A pessoa mencionada não tem um perfil! Peça para um `Administrador` fazer um!**
 				{{end}}
 			{{else}}> **Usuário inválido**
 			{{end}}
 
 		{{else}}
-		{{$id := toInt64 .User.ID}}
+		{{$id = toInt64 .User.ID}}
 			{{if (dbGet $id "profilemain")}}
 			{{$status := (dbGet $id "profilemain").Value}}
-			{{$stats := sdict $status}}
+			{{$stats = sdict $status}}
 
-			{{$color := randInt 0 16777215}}
+			{{$color = randInt 0 16777215}}
 			{{$cor := ($stats.Get "cor")}}
 				{{if $cor}}
 				{{$color = ($stats.Get "cor")}}
 				{{end}}
 			{{$color = toInt $color}}
+			{{$check = true}}
 
-			{{$hide := toInt ($stats.Get "hide")}}
-				{{$embed := cembed "title" (joinStr ""  ($stats.Get "nome")) "description" (joinStr "" "**```ansi\n[2;30m┏━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┓\n[2;30m┣💗[2;38m⊰⩥[2;30m❪[2;35mHP[2;30m❫『[2;31m" ($stats.Get "HP") " [2;30m| [2;31m" ($stats.Get "MaxHP") "[2;30m』\n┣🔵[2;38m⊰⩥[2;30m❪[2;36mMP[2;30m❫『[2;34m" ($stats.Get "Energia") " [2;30m| [2;34m" ($stats.Get "MaxEnergia") "[2;30m』\n┣💠[2;38m⊰⩥[2;30m❪[2;32mRD[2;30m❫『[2;33m" ($stats.Get "RD") "% [2;30m| [2;33m" ($stats.Get "Escudo") "[2;30m』\n┗━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┛```**" "\n**```ansi\n[2;36m🌐⊰⩥[2;30m【[2;33m𝐍𝐢𝐯𝐞𝐥: [2;37m" ($stats.Get "Nivel") "[2;30m】\n🧠[2;36m⊰⩥[2;30m【[2;35m𝐒𝐚𝐧𝐢𝐝𝐚𝐝𝐞: [2;37m" ($stats.Get "Sanidade") "[2;30m】```**" "\n**```ansi\n[2;30m╭──────────────────╮\n[2;30m│👊[2;38m⊰⩥[2;34m「[2;31mForça: [2;37m" ($stats.Get "DanoFis") "\n[2;30m│✨️[2;38m⊰⩥[2;34m「[2;36mPoder: [2;37m" ($stats.Get "DanoMa") "\n[2;30m╰──────────────────╯```**") "thumbnail" (sdict "url" ($stats.Get "foto")) "color" $color}}
-				{{sendMessage nil $embed}}
 			{{else}}> **Você não tem um perfil! Peça para um `Administrador` fazer um para você!**
 			{{end}}
 		{{end}}
 	{{end}}
+
+{{if eq $check true}}
+	{{$descricao = joinStr "" "**```ansi\n[2;30m┏━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┓\n[2;30m┣💗[2;38m⊰⩥[2;30m❪[2;35mHP[2;30m❫『[2;31m" ($stats.Get "HP") " [2;30m| [2;31m" ($stats.Get "MaxHP") "[2;30m』\n┣🔵[2;38m⊰⩥[2;30m❪[2;36mMP[2;30m❫『[2;34m" ($stats.Get "Energia") " [2;30m| [2;34m" ($stats.Get "MaxEnergia") "[2;30m』\n┣💠[2;38m⊰⩥[2;30m❪[2;32mRD[2;30m❫『[2;33m" ($stats.Get "RD") "% [2;30m| [2;33m" ($stats.Get "Escudo") "[2;30m』\n┗━━┅┅┅┄┄⟞⟦[2;33m✮[2;30m⟧⟝┄┄┉┉┅━━┛```**" "\n**```ansi\n[2;36m🌐⊰⩥[2;30m【[2;33m𝐍𝐢𝐯𝐞𝐥: [2;37m" ($stats.Get "Nivel") "[2;30m】\n💰[2;36m⊰⩥[2;30m【[2;32m𝐃𝐢𝐧𝐡𝐞𝐢𝐫𝐨: [2;37m" ($stats.Get "Money") "[2;30m】\n🧠[2;36m⊰⩥[2;30m【[2;35m𝐒𝐚𝐧𝐢𝐝𝐚𝐝𝐞: [2;37m" ($stats.Get "Sanidade") "[2;30m】\n⭐️[2;36m⊰⩥[2;30m【[2;34m𝐅𝐚𝐦𝐚: [2;37m" ($stats.Get "Fama") "[2;30m】```**" "\n**```ansi\n[2;30m╭──────────────────╮\n[2;30m│👊[2;38m⊰⩥[2;34m「[2;31mForça: [2;37m" ($stats.Get "DanoFis") "\n[2;30m│✨️[2;38m⊰⩥[2;34m「[2;36mPoder: [2;37m" ($stats.Get "DanoMa") "\n[2;30m╰──────────────────╯```**"}}
+	{{$title = joinStr "" ($stats.Get "nome")}}
+
+{{if eq $user.ID 475476114534563860}}
+{{if eq ($stats.Get "nome") "𝐒𝐚𝐤𝐢 𝐍𝐢𝐰𝐚"}}
+	{{$descricao = joinStr "" $descricao "\n**```ansi\n[2;35m╭⊶⊷⊶⊷⊶⊷⊶⊷⊶⊷⊶⊷⊶\n│[2;37m◈𝐏𝐄́𝐓𝐀𝐋𝐀𝐒:[2;35m 🌸" ($stats.Get "Petalas") "/" ($stats.Get "MaxPetalas") "\n[2;35m╰⊶⊷⊶⊷⊶⊷⊶⊷⊶⊷⊶⊷⊶\n```**"}}
+{{end}}
+{{end}}
+
+{{if eq $user.ID 400074827710332928}}
+{{$descricao = joinStr "" $descricao "\n**```ansi\n[2;35m╭⊶⊷⊶⊷⊶⊷⊶⊷⊶⊷⊶⊷⊶\n│[2;37m◈teste:[2;35m 🌸" ($stats.Get "lutando") "/" ($stats.Get "MaxPetalas") "\n[2;35m╰⊶⊷⊶⊷⊶⊷⊶⊷⊶⊷⊶⊷⊶\n```**"}}
+{{end}}
+
+{{end}}
+
+{{if eq $slot true}}
+	{{$title = joinStr "" ($stats.Get "nome") " | " ( $profileK )}}
+{{end}}
+
+{{$embed := cembed "title" $title "description" $descricao "thumbnail" (sdict "url" ($stats.Get "foto")) "color" $color}}
+
+{{sendMessage nil $embed}}
+
