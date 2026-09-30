@@ -24,3 +24,5 @@ color { Serve para escolher uma cor para a borda do embed (escolha entre 0 a 167
 trocar { Serve para trocar o seu perfil sendo utilizado atualmente por um outro perfil já criado }
 
 dano automatico { Conta todo dano automaticamente, puxando as informações do próprio perfil, no entanto extremamente desorganizado de se usar }
+
+https://www.canvaqr.com/RGSSk9dNvP
